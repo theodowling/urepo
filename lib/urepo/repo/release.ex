@@ -37,8 +37,7 @@ defmodule Urepo.Repo.Release do
 
   defp validate_metadata(meta) do
     with :ok <- validate_name(meta["name"]),
-         :ok <- validate_version(meta["version"]),
-         do: :ok
+         do: validate_version(meta["version"])
   end
 
   defp validate_name(name) do

@@ -50,22 +50,15 @@ defmodule Urepo.MixProject do
 
   defp deps do
     [
-      {:plug_cowboy, "~> 2.3"},
-      {:hex_core, "~> 0.6.0"},
-      {:ex_aws_s3, "~> 2.0"},
-      {:google_api_storage, "~> 0.19.0"},
-      {:goth, "~> 1.2.0"},
-      {:sweet_xml, "~> 0.6.6"},
-      {:jason, "~> 1.0"},
-      {:hackney, "~> 1.16"},
-      # Deployment
-      {:distillery, "~> 2.1"},
-      {:systemd, "~> 0.5"},
-      # Observability
-      {:prometheus_plugs, "~> 1.1"},
+      {:plug_cowboy, "~> 2.6"},
+      {:hex_core, "~> 0.10.0"},
+      {:ex_aws_s3, "~> 2.5.2"},
+      {:sweet_xml, "~> 0.7.4"},
+      {:jason, "~> 1.4.1"},
+      {:hackney, "~> 1.20.1"},
       # Development tools
-      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
-      {:credo, "~> 1.4", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4.2", only: :dev, runtime: false},
+      {:credo, "~> 1.7.1", only: :dev, runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:excoveralls, ">= 0.0.0", only: [:dev, :test], runtime: false}
     ]

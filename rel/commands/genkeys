@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-release_ctl eval --mfa "Urepo.CLI.genkeys/1" --argv -- "$@"

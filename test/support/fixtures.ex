@@ -1,7 +1,7 @@
 defmodule Urepo.Fixtures do
   @moduledoc false
 
-  @fixtures Application.get_env(:urepo, :fixtures, "test/fixtures")
+  @fixtures Application.compile_env(:urepo, :fixtures, "test/fixtures")
 
   @doc """
   Read fixture ad given path

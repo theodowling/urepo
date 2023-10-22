@@ -51,6 +51,7 @@ defmodule Urepo do
   def private_key do
     perm_get(:private_key, fn ->
       Application.fetch_env!(:urepo, :private_key)
+      |> Path.expand(File.cwd!())
       |> File.read!()
     end)
   end
@@ -60,7 +61,9 @@ defmodule Urepo do
     perm_get(:public_key, fn ->
       case Application.fetch_env(:urepo, :public_key) do
         {:ok, path} ->
-          File.read!(path)
+          path
+          |> Path.expand(File.cwd!())
+          |> File.read!()
 
         :error ->
           private_key()

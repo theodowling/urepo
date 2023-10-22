@@ -8,8 +8,6 @@ defmodule Urepo.Endpoint do
 
   plug(Plug.Logger)
   plug(Plugs.Health)
-  plug(Plugs.Exporter)
-  plug(Plugs.Instrumenter)
   plug(:forward)
 
   defp forward(conn, _opts) do

@@ -1,24 +1,66 @@
-# Use an official kobil runtime as a parent image
-FROM git.scp.kobil.com:4567/ecoservers/eco-docker/ubuntu:18.04
+ARG ELIXIR_VERSION=1.15.6
+ARG OTP_VERSION=26.1.1
+ARG DEBIAN_VERSION=buster-20230612-slim
 
-ARG BUILD_DATE
-ARG NAME
-ARG DESCRIPTION
-ARG VCS_REF
-ARG VCS_URL
-ARG VERSION
-LABEL org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.name=$NAME \
-      org.label-schema.description=$DESCRIPTION \
-      org.label-schema.url="https://www.kobil.com/" \
-      org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url=$VCS_URL \
-      org.label-schema.vendor="Kobil Systems Gmbh" \
-      org.label-schema.version=$VERSION \
-      org.label-schema.schema-version="1.0"
+ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
-USER appuser
+FROM ${BUILDER_IMAGE} as builder
 
-COPY --chown=appuser:appuser _build/prod/rel/urepo /app
+RUN apt-get update -y && apt-get install -y build-essential git && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
-ENTRYPOINT ["/app/bin/urepo"]
+# prepare build dir
+WORKDIR /app
+
+RUN mix local.hex --force && mix local.rebar --force
+
+# set build ENV
+ENV MIX_ENV="prod"
+
+# install mix dependencies
+COPY mix.exs mix.lock ./
+RUN mix deps.get --only $MIX_ENV
+RUN mkdir config
+
+COPY config/config.exs config/${MIX_ENV}.exs config/
+RUN mix deps.compile
+
+COPY lib lib
+
+# Compile the release
+RUN mix compile
+
+# Generate a release
+RUN mix release
+
+#---------------------------
+# prepare release image
+FROM ${RUNNER_IMAGE}
+
+EXPOSE 8080
+
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
+  && apt-get clean && rm -f /var/lib/apt/lists/*_*
+
+# Set the locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+
+ENV LANG en_US.UTF-8
+
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+WORKDIR "/app"
+RUN chown nobody /app
+
+# set runner ENV
+ENV MIX_ENV="prod"
+
+COPY config/config.exs config/prod.exs config/runtime.exs config/
+
+# Only copy the final release from the build stage
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/urepo ./
+
+USER nobody
+
+CMD ["bin/urepo", "start"]

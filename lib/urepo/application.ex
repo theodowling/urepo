@@ -15,7 +15,6 @@ defmodule Urepo.Application do
       Urepo.Repo,
       Urepo.Docs,
       {Plug.Cowboy, scheme: :http, plug: Urepo.Endpoint, options: [port: port]},
-      :systemd.ready(),
       {Task, fn -> Logger.info("Listening on :#{port}") end},
       {Plug.Cowboy.Drainer, refs: :all}
     ]
@@ -24,16 +23,6 @@ defmodule Urepo.Application do
       strategy: :one_for_one
     ]
 
-    _ = setup()
-
     Supervisor.start_link(children, opts)
-  end
-
-  defp setup do
-    [
-      Urepo.Plugs.Exporter,
-      Urepo.Plugs.Instrumenter
-    ]
-    |> Enum.each(& &1.setup())
   end
 end

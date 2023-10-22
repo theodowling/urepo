@@ -19,7 +19,6 @@ This application takes only few configuration options:
 
     + `Urepo.Store.Local`
     + `Urepo.Store.S3`
-    + `Urepo.Store.GoogleCloudStorage`
 
 Example `sys.config`:
 
@@ -32,6 +31,3 @@ Example `sys.config`:
                {secret_access_key,<<"minioadmin">>}]}]}].
 ```
 
-## Copyright
-
-Copyright (c) 2020 Kobil Systems GmbH

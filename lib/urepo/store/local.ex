@@ -22,8 +22,7 @@ defmodule Urepo.Store.Local do
            file_path
            |> Path.dirname()
            |> File.mkdir_p(),
-         :ok <- File.write(file_path, content),
-         do: :ok
+         do: File.write(file_path, content)
   end
 
   @impl true
@@ -37,7 +36,6 @@ defmodule Urepo.Store.Local do
            file_path
            |> Path.dirname()
            |> File.mkdir_p(),
-         {:ok, content} <- File.read(file_path),
-         do: {:ok, content}
+         do: File.read(file_path)
   end
 end
